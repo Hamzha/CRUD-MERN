@@ -110,7 +110,7 @@ exports.edit_user = async (req, res) => {
       }
     )
     if (responseUpdateUser)
-      return res.status(204).json();
+      return res.status(200).json(responseUpdateUser);
 
   } catch (err) {
     console.log(err)

@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit' //next js redux toolkit
 
-import axios from "axios";
 import { call } from '../api/callConfig';
 
 export const GetLogin = createAsyncThunk(
@@ -51,8 +50,8 @@ export const UpdateUser = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const res = await call("http://localhost:5000/edit/" + data._id, 'post', data)
-
-      return res
+      console.log(res)
+      return data;
     } catch (err) {
       return err
     }
@@ -129,13 +128,19 @@ export const userSlice = createSlice({
       console.log(action)
       state.userList = action.payload.data.users
       state.status = 'idle'
-
     },
     [GetListUser.rejected]: (state) => {
       state.userList = []
       state.error = 'Not Authrized'
       state.status = 'idle'
-
+    },
+    [UpdateUser.fulfilled]: (state, data) => {
+      console.log(state.user.user._id, data.payload)
+      state.selectedUser = data.payload
+      if (state.user.user._id === data.payload._id) {
+        state.user.user.name = data.payload.name
+        state.user.user.email = data.payload.email
+              }
     }
 
   }
