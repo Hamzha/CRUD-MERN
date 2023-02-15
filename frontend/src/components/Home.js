@@ -2,9 +2,7 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/esm/Container';
 import { useDispatch, useSelector } from 'react-redux';
-import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
-import { SetSelected } from '../store/userSlice';
 import Row from 'react-bootstrap/Row';
 
 
@@ -31,14 +29,7 @@ export default function Home() {
           </Row>
 
         </div>
-        {user.user.admin && <Button variant="primary" onClick={() => {
-          navigate('/list-user');
-        }} >List User</Button>
-        }
-        <Button className='ms-3' onClick={() => {
-          dispatch(SetSelected(user.user));
-          navigate('/user/edit/' + user.user._id);
-        }}>Edit</Button>
+
       </Card.Body>
     </Card>
   </Container >;
