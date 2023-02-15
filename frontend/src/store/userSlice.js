@@ -130,10 +130,6 @@ export const userSlice = createSlice({
         state.user = action.payload.data
         state.login = true
       }
-      else {
-        state.status = 'rejected'
-        state.message = action.payload.response.data.message
-      }
     },
 
     [GetUserByID.fulfilled]: (state, action) => {

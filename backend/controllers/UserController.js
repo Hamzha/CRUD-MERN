@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const bycrypt = require("bcrypt");
 const User = require('../models/user')
 const JWT = require("jsonwebtoken");
-
-
+// const NumberAddictionJob = require("../agenda/numberAddition")
+const NumberAdditionJobMultiple = require("../agenda/multipleAdditions")
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -15,7 +15,8 @@ exports.login = async (req, res) => {
       const responseUser = await User.findOne({ email })
       if (responseUser) {
         const resposnePass = await bycrypt.compare(password, responseUser.password)
-
+        // NumberAddictionJob()
+        NumberAdditionJobMultiple();
         if (resposnePass) {
           const token = await JWT.sign({ _id: responseUser._id }, process.env.JWT_SECRET);
           const { _id, name, email, admin } = responseUser;

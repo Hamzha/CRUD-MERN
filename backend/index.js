@@ -8,6 +8,7 @@ const PORT = 5000;
 
 
 require("./models/user");
+require("./models/number")
 
 app.use(cors());
 app.use(express.json());
