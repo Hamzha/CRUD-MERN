@@ -1,99 +1,57 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit' //next js redux toolkit
 
 import axios from "axios";
+import { call } from '../api/callConfig';
 
 export const GetLogin = createAsyncThunk(
   'user/getLogin',
-  async (data, thunkAPI) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const res = await axios({
-        method: "post",
-        url: "http://localhost:5000/login",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        },
-        data
-      })
+      const res = await call("http://localhost:5000/login", 'post', data)
       return res
     } catch (err) {
-      return err
+      return rejectWithValue("User Not found")
     }
   })
 
 export const Register = createAsyncThunk(
   'user/register',
-  async (data, thunkAPI) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const res = await axios({
-        method: "post",
-        url: "http://localhost:5000/register",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        },
-        data
-      })
+      const res = await call("http://localhost:5000/register", 'post', data)
       return res
     } catch (err) {
-      return err
+      console.log(err.response.data.message)
+      rejectWithValue(err.response.data.message)
     }
   })
 export const GetListUser = createAsyncThunk(
   'user/getUsers',
-  async (data, thunkAPI) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const res = await axios({
-        method: "get",
-        url: "http://localhost:5000/all-users",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: "Bearer " + data.token,
-
-        },
-        data
-      })
+      const res = await call("http://localhost:5000/all-users", 'get', data)
       return res
     } catch (err) {
-      return err
+      rejectWithValue("Not authorized")
     }
   })
 export const GetUserByID = createAsyncThunk(
   'user/getUser',
   async (data, thunkAPI) => {
     try {
-      const res = await axios({
-        method: "get",
-        url: "http://localhost:5000/user/" + data.id,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: "Bearer " + data.token,
-
-        },
-        data
-      })
+      const res = await call("http://localhost:5000/user/" + data.id, 'get', data)
       return res
     } catch (err) {
       return err
     }
   })
+
 export const UpdateUser = createAsyncThunk(
   'user/updateUser',
   async (data, thunkAPI) => {
     try {
-      const res = await axios({
-        method: "post",
-        url: "http://localhost:5000/edit/" + data._id,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: "Bearer " + data.token,
+      const res = await call("http://localhost:5000/edit/" + data._id, 'post', data)
 
-        },
-        data
-      })
       return res
     } catch (err) {
       return err
@@ -103,44 +61,81 @@ export const userSlice = createSlice({
   name: 'user',
   initialState: {
     user: {},
+    userList: [],
     selectedUser: {},
     login: false,
     status: 'idle',
-    message: ''
+    error: ''
   },
   reducers: {
     SetState: (state, { payload: { field, value } }) => {
       state[field] = value;
     },
     Logout: (state) => {
-      state.login = false
       state.user = {}
+      state.userList = []
+      state.selectedUser = {}
+      state.login = false
+      state.status = 'idle'
+      state.error = ''
     },
     SetSelected: (state, payload) => {
       state.selectedUser = payload.payload
     }
   },
   extraReducers: {
-    [GetLogin.pending]: (state) => {
+    [GetLogin.pending]: (state, action) => {
       state.status = 'loading'
     },
     [GetLogin.fulfilled]: (state, action) => {
-      if (action.payload.status === 200) {
-        state.status = 'completed'
-        state.user = action.payload.data
-        state.login = true
-      }
+      state.error = ""
+      state.status = 'idle'
+      state.user = action.payload.data
+      state.login = true
+
+    },
+    [GetLogin.rejected]: (state, action) => {
+      console.log('action', action)
+      state.status = 'idle'
+      state.error = action.payload
+
+    },
+    [Register.pending]: (state, action) => {
+      console.log('test')
+
+      state.status = 'loading'
+    },
+    [Register.fulfilled]: (state, action) => {
+      state.status = 'idle'
+      state.error = ''
     },
 
+    [Register.rejected]: (state, action) => {
+      console.log('action', action)
+      state.status = 'idle'
+      state.error = action.payload
+
+    },
     [GetUserByID.fulfilled]: (state, action) => {
       if (action.payload.status === 200) {
         state.selectedUser = action.payload.data
       }
     },
-    [Register.fulfilled]: (state, action) => {
-      if (action.payload.status !== 200) {
-        state.message = action.payload.response.data.message
-      }
+
+    [GetLogin.pending]: (state, action) => {
+      state.status = 'loading'
+    },
+    [GetListUser.fulfilled]: (state, action) => {
+      console.log(action)
+      state.userList = action.payload.data.users
+      state.status = 'idle'
+
+    },
+    [GetListUser.rejected]: (state) => {
+      state.userList = []
+      state.error = 'Not Authrized'
+      state.status = 'idle'
+
     }
 
   }

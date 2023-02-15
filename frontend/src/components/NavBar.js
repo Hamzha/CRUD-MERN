@@ -1,13 +1,15 @@
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Logout } from '../store/userSlice';
+import { Logout, SetSelected } from '../store/userSlice';
 
 function NavBar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
+
   return (
     <Navbar bg="light" expand="lg">
       <Container>
@@ -17,6 +19,15 @@ function NavBar() {
             <Nav.Link onClick={() => {
               navigate('/home');
             }}>Home</Nav.Link>
+            <Nav.Link onClick={() => {
+              dispatch(SetSelected(user.user));
+              navigate('/user/edit/' + user.user._id);
+            }}>Edit</Nav.Link>
+            {user.user.admin &&
+              <Nav.Link onClick={() => {
+                navigate('/list-user');
+              }}>List</Nav.Link>
+            }
             <Nav.Link onClick={() => {
               dispatch(Logout());
               navigate('/login');

@@ -3,7 +3,9 @@ const bycrypt = require("bcrypt");
 const User = require('../models/user')
 const JWT = require("jsonwebtoken");
 // const NumberAddictionJob = require("../agenda/numberAddition")
-const NumberAdditionJobMultiple = require("../agenda/multipleAdditions")
+// const NumberAdditionJobMultiple = require("../agenda/multipleAdditions")
+
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -16,7 +18,7 @@ exports.login = async (req, res) => {
       if (responseUser) {
         const resposnePass = await bycrypt.compare(password, responseUser.password)
         // NumberAddictionJob()
-        NumberAdditionJobMultiple();
+        // NumberAdditionJobMultiple();
         if (resposnePass) {
           const token = await JWT.sign({ _id: responseUser._id }, process.env.JWT_SECRET);
           const { _id, name, email, admin } = responseUser;
@@ -85,7 +87,7 @@ exports.get_all_users = async (req, res) => {
 
 exports.get_user_by_id = async (req, res) => {
   const responseUser = await User.findOne({ _id: req.params.userId }).select('-password');
-  if (!responseUser) {
+  if (responseUser) {
     return res.status(200).json(responseUser)
   } else {
     return res.status(404).json({ error: "User not found!" });
@@ -96,7 +98,7 @@ exports.edit_user = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!email || !name || !password) {
-    return res.status(422).json({ message: "Please add all parameters" });
+    return res.status(400).json({ message: "Please add all parameters" });
   }
   try {
     const responseUpdateUser = await User.updateOne(

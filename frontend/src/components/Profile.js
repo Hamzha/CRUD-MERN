@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GetUserByID } from '../store/userSlice';
@@ -7,14 +7,8 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/esm/Container';
 
 export default function UserProfile() {
-  const { user, selectedUser } = useSelector(state => state.user);
-  const dispatch = useDispatch();
-  const { id } = useParams();
+  const { selectedUser } = useSelector(state => state.user);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    dispatch(GetUserByID({ token: user.token, id }))
-  }, [dispatch, id, user])
 
   return <Container className='p-5'>
     <Card className=' align-center m-5 p-3'>
@@ -25,7 +19,7 @@ export default function UserProfile() {
           <div className='row'><p>Admin: {selectedUser.admin ? "True" : 'False'}</p></div>
 
           <Button onClick={() => {
-            navigate('/user/edit/' + id)
+            navigate('/user/edit/' + selectedUser._id)
               ()
           }}>Edit</Button>
         </>}

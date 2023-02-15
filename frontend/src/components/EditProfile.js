@@ -26,7 +26,7 @@ export default function EditProfile() {
   const navigate = useNavigate();
 
   const onSubmitHandler = async (data) => {
-    await dispatch(UpdateUser({ ...data, _id: selectedUser._id, token: user.token }));
+    dispatch(UpdateUser({ ...data, _id: selectedUser._id, token: user.token }));
     navigate(-1);
   };
 

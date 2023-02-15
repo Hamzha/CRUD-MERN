@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { Register } from '../store/userSlice';
@@ -20,17 +20,19 @@ const schema = yup.object().shape({
 
 export default function SignUp() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const {error} = useSelector(state=>state.user)
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmitHandler = async (data) => {
-    const response = await dispatch(Register(data));
-    if (response.payload.status !== 200) { alert(response.payload.response.data.message); }
-    else { navigate('/login'); }
+    dispatch(Register(data))
   };
-
+  useEffect(()=>{
+    if(error.length !== 0){
+      alert(error)
+    }
+  },[error])
   return <Container className='p-5'>
     <Card className='m-5 p-3'>
       <Card.Body>

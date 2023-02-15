@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { GetLogin } from '../store/userSlice';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
@@ -23,14 +23,16 @@ export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
-
+  const { error } = useSelector(state => state.user)
   const onSubmitHandler = async (data) => {
-    const response = await dispatch(GetLogin(data));
-    if (response?.payload?.response?.status !== 200) {
-      alert(response.payload.response.data.message);
-    }
+    dispatch(GetLogin(data));
   };
-
+  useEffect(() => {
+    if (error.length !== 0) {
+      console.log(error)
+      alert(error)
+    }
+  }, [error])
   return <Container className='p-5'>
     <Card className='m-5 p-3'>
       <Card.Body>

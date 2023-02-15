@@ -8,21 +8,21 @@ import Card from 'react-bootstrap/Card';
 
 export default function ListUser() {
   const dispatch = useDispatch();
-  const { user } = useSelector(state => state.user);
-  const [userList, setUserList] = useState([]);
+  const { user, userList, error } = useSelector(state => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
-      const response = await dispatch(GetListUser({ token: user.token }));
-      if (response.payload.status === 200)
-        setUserList(response.payload.data.users);
-      else
-        alert('Please try later!');
+      dispatch(GetListUser({ token: user.token }));
     }
     fetchData();
-  }, [dispatch, user]);
-
+  }, [user]);
+  useEffect(() => {
+    if (error.length !== 0) {
+      console.log(error)
+      alert(error)
+    }
+  }, [error])
   return <Container className='p-5'>
     <Card className='m-5 p-3'>
       <h3 className='text-center'>List User</h3>
